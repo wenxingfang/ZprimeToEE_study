@@ -31,7 +31,7 @@ def draw_plots(date, out_dir, h_stack,h_mc,g_mc,h_data,out_name, blind):
     x_min=70
     x_max=4000
     y_min=1E-5
-    y_max=1.3E6
+    y_max=3E6
     if "cumlative" in out_name:
         y_max=1E8
         y_min=1E-2
