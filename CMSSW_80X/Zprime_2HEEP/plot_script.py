@@ -1,4 +1,3 @@
-
 def draw_plots(date, out_dir, h_stack,h_mc,g_mc,h_data,out_name, blind):
     stat_style=1001
     stat_color=ROOT.kRed-10
@@ -32,17 +31,16 @@ def draw_plots(date, out_dir, h_stack,h_mc,g_mc,h_data,out_name, blind):
     x_min=70
     x_max=4000
     y_min=1E-5
-    y_max=5E6
+    y_max=1.3E6
     if "cumlative" in out_name:
         y_max=1E8
-        y_min=1E-4
+        y_min=1E-2
     dummy = ROOT.TH2D("dummy","",nbin,x_min,x_max,1,y_min,y_max)
     dummy.SetStats(ROOT.kFALSE)
     X_title='m(ee) [GeV]'
     dummy_Y_title='Events / GeV'
     if "cumlative" in out_name :
         dummy_Y_title='Events #geq m(ee)'
-
     dummy.GetYaxis().SetTitle(dummy_Y_title)
     dummy.GetYaxis().SetTitleSize(0.05)
     dummy.GetYaxis().SetLabelSize(0.045)
@@ -75,8 +73,6 @@ def draw_plots(date, out_dir, h_stack,h_mc,g_mc,h_data,out_name, blind):
         h_Zprime.Scale(tmp_scale)
         h_Zprime_bgk=h_mc.Clone("Zprime_bgk")
         h_Zprime_bgk.Add(h_Zprime)
-        for iZ in range(1,h_Zprime.GetNbinsX()+1):
-            if h_Zprime.GetBinLowEdge(iZ)<2400 or h_Zprime.GetBinLowEdge(iZ)>3500:h_Zprime_bgk.SetBinContent(iZ,0)
         h_Zprime_bgk.SetLineColor(ROOT.TColor.GetColor("#008000"))
         h_Zprime_bgk.SetLineWidth(2)
         h_Zprime_bgk.Draw("sames:hist")
@@ -131,7 +127,7 @@ def draw_plots(date, out_dir, h_stack,h_mc,g_mc,h_data,out_name, blind):
     label_prelim.SetFillStyle(0)
     label_prelim.SetTextFont(51)
     label_prelim.SetTextSize(0.44/0.75 * 0.8)
-    label_prelim.Draw()
+    #label_prelim.Draw()
     label_lumi = ROOT.TPaveLabel(0.67, 0.902, 0.992, 0.997, "35.9 fb^{-1} (13 TeV)", "brNDC")
     label_lumi.SetBorderSize(0)
     label_lumi.SetFillColor(0)
@@ -172,7 +168,7 @@ def draw_plots(date, out_dir, h_stack,h_mc,g_mc,h_data,out_name, blind):
     ratio_y_max=1
     dummy_ratio = ROOT.TH2D("dummy_ratio","",nbin,x_min,x_max,1,ratio_y_min,ratio_y_max)
     dummy_ratio.SetStats(ROOT.kFALSE)
-    dummy_ratio.GetYaxis().SetTitle('(Data #minus Bgk) / Bgk')
+    dummy_ratio.GetYaxis().SetTitle('(Data #minus Bkg) / Bkg')
     dummy_ratio.GetXaxis().SetTitle(X_title)
     dummy_ratio.SetMarkerSize(0.7)
     dummy_ratio.GetXaxis().SetTitleSize(0.14)
@@ -195,7 +191,9 @@ def draw_plots(date, out_dir, h_stack,h_mc,g_mc,h_data,out_name, blind):
     g_mc_stat.SetFillStyle(stat_style)
     g_mc_stat_sys.Draw("2p")
     dummy_ratio.Draw("AXISSAME")
+    remove_zero_point(g_ratio)
     g_ratio.Draw("pZ0")
     canvas.Update()
     canvas.Print('%s/%s/%s.png'%(out_dir,date,out_name))    
     canvas.SaveAs('%s/%s/%s.pdf'%(out_dir,date,out_name))    
+    canvas.SaveAs('%s/%s/%s.root'%(out_dir,date,out_name))    
