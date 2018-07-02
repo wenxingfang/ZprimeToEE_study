@@ -1,0 +1,9 @@
+cd ./DoubleMuon
+bash ls.sh
+cd ../MuonEG
+bash ls.sh
+cd ../SingleElectron
+bash ls.sh
+cd ../SingleMuon
+bash ls.sh
+echo "done!"
