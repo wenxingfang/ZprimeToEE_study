@@ -1,0 +1,103 @@
+voms-proxy-init --voms cms:/cms/becms  #before run command
+
+###################################################
+source /cvmfs/cms.cern.ch/crab/crab.sh # for crab2
+
+crab -create
+crab -submit -c jobdirectory
+crab -status -c jobdirectory
+crab -getoutput 1,2,... -c jobdirectory
+crab -submit 1,2,... -c jobdirectory
+crab -kill 1,2,... -c jobdirectory
+########################################################
+source /cvmfs/cms.cern.ch/crab3/crab.sh #for crab3
+
+crab submit -c crabconfigfile
+crab status jobdirectory --long
+crab resubmit -d <CRAB-project-directory> [--jobids <comma-separated-list-of-jobs-and/or-job-ranges>]
+crab getoutput  crab_projects/crab_20150216_PHYS14_TT_20bx25/
+crab getoutput  crab_projects/crab_20150216_PHYS14_TT_20bx25/ --jobids 1-20
+********************************************************
+
+srmrm srm://maite.iihe.ac.be:8443/pnfs/iihe/cms/store/user/wenxing/test.file #delete file
+dccp dcap://maite.iihe.ac.be/pnfs/iihe/cms/store/user/wenxing/test.file .   #cp  file 
+srmcp srm://maite.iihe.ac.be:8443/pnfs/iihe/cms/store/user/wenxing/test.file file:////user/wenxing/ #cp file
+
+#####################Liunx############################
+bash run.sh |& tee log.txt##save output result to log.txt
+bash run.sh |& tee -a log.txt## for append mode
+logsave -a /var/varlog.log ls /var/log (-a for append)
+
+
+tar zxvf FileName.tar.gz #untar
+tar zcvf FileName.tar.gz DirName # tar
+
+nohup ./test &  # nohup.out
+nohup root -l tag_probe_D.C > 25ns_golden_D.txt 2>&1 &
+./test & 
+./test & > log.txt
+ps au
+du -h (-sh) ##
+jobs
+
+ls -l |grep "^-"|wc -l
+
+awk  '$3>4300000000  {print  $3}' list_BB_BE_MiniAOD_0228.txt > test.txt
+awk 'NR==FNR{a[$1]=$0}NR>FNR{print $1,a[$2]}' file2 file1 
+awk -F: 'NR>=2&&NR<=5{print $1 }' ee_1jet_1bjet_bplus_s_sorted.txt|xargs -I {} python ~/Limits/CMSSW_7_4_7/src/LimitCode/tW_measurment/Closure_checks/diffNuisances_wx.py -a mlfit.root -g plots.root -n {} --poi {}
+
+find AN_plots/ -name "*.pdf" -print0 | xargs -0 rm  # delete special file
+find AN_plots/ -name "*.pdf"          -exec rm {} \;# delete special file
+find        ./ -name "split_*"        -exec sed -i '$a echo "AllCompleted"' {} \; #write echo "AllCompleted" in last
+
+rsync -av --exclude='*.jpg' source destination
+rsync -av --exclude='path1/to/exclude' --exclude='path2/to/exclude' source destination
+
+
+screen -X -S 3044 quit
+
+
+comm -12 file1 file2 ##give common part of the files, for sorted file, details(http://blog.csdn.net/tianmohust/article/details/6997924)
+comm - 23    只显示在第一个文件中出现而未在第二个文件中出现的行；
+
+split -l 100 BLM.txt -d -a 4 BLM_ # split file, details(http://blog.csdn.net/mxgsgtc/article/details/12048919)
+sort -n -k 1 -t : facebook.txt # sort according number(-n) which frist row(-k 1) and the separator is ":" (-t :)
+
+
+qselect -u $USER | xargs qdel ##delete all jobs
+
+##################### vim ###########################
+Ctrl+v then esc then  :%s/\%Vus/az/g (replace us to az in last visual area)
+gg=G
+11,22g/aa/d (delete the line contains aa)
+
+g/^s*$/d (delete empty line)
+######################gitlab###########################
+git clone ssh://git@gitlab.cern.ch:7999/wenxing/HEEPScaleFactorStudy.git
+git add -u
+git add directory
+git commit -m "update"
+git push ###make the change
+git pull ######get latest version
+
+#################### JSON ##########################
+compareJSON.py --diff new_json odd_json
+
+####################### make edm ##############
+mkedanlzr test
+
+################# root ####################
+gDirectory->cd("toys")
+
+######## combine command ##########
+
+combine -M MaxLikelihoodFit datacard.txt  --saveNormalizations  ## observed r and save the output (mlfit.root)
+combine -M MaxLikelihoodFit data_card_comb/emu_card.txt  -t -1 --expectSignal=1 ## for expected r==1
+combine -M ProfileLikelihood --signif datacard.txt ## observed significance
+combine -M ProfileLikelihood --significance datacard.txt -t 10 --expectSignal=1 ##for expected significance (10Toy)
+PostFitShapesFromWorkspace -o postfit_shapes.root -f mlfit.root:fit_s --postfit --sampling --print -d data_card.txt -w datacard.root  ## need datacard.root using text2workspace , need mlfit.root
+############ check each uncertainty ########
+1, combine card.txt -M MultiDimFit --saveWorkspace ## add -t -1 --expectSignal=0 for exp 
+2-1, combine higgsCombineTest.MultiDimFit....blah.root -M MaxLikelihoodFit --snapshotName MultiDimFit --freezeNuisances all ##freeze all systematic unertainties just data statistic unertainty
+2-2, combine higgsCombineTest.MultiDimFit....blah.root -M MaxLikelihoodFit --snapshotName MultiDimFit --freezeNuisances unc1,unc2 ##freee some uncertainty 
+add --rMax 2  --robustFit=1  --minimizerTolerance=0.001 ## change minos to robustFit 
